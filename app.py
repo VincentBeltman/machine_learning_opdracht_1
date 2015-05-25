@@ -14,14 +14,16 @@ def readTrainingSet(name):
 			if len(line.split(', ')) == 15:
 				filtered.append(line)
 				numberOfLines += 1
-		returnMat = zeros((numberOfLines, 14), dtype=float)
+		returnMat = zeros((numberOfLines, 13), dtype=float)
 		classLabelVector = []
 		colors = []
 		for i, line in enumerate(filtered):
 			listFromLine = []
 			for j, item in enumerate(line.split(', ')):
 				if j in [0,2,4,10,11,12]:
-					listFromLine.append(int(item))
+					# Is het capital loss of gain? Voeg alleen toe als de waarde niet nul is
+					if (j in [10, 11] and not(item == '0')) or True:  
+						listFromLine.append(int(item))
 				elif item == '?':
 					listFromLine.append(0)
 				elif j == 1:
@@ -42,18 +44,17 @@ def readTrainingSet(name):
 					listFromLine.append(sv.country.index(item))
 				elif j == 14:
 					listFromLine.append(item.replace(".", ""))
-			returnMat[i,:] = listFromLine[0:14]
+			returnMat[i,:] = listFromLine[0:13]
 			classLabelVector.append(listFromLine[-1])
 			if listFromLine[-1] == '<=50K\n':
-				colors.append(0)
+				colors.append('g')
 			else:
-				colors.append(100)
+				colors.append('r')
 
 		return returnMat, classLabelVector, colors
 
 def showScatterPlot(data, colors, idx1, idx2):
 	import matplotlib.pyplot as plt
-	N = 50
 	plt.scatter(data[:,idx1], data[:,idx2], c=colors)
 	plt.show()
 
@@ -127,13 +128,13 @@ if __name__ == "__main__":
 		'naive': naive,
 		'': knn}  # MIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKE
 	trainingset, trainingLabels, colors = readTrainingSet("adult.data")
-	dataset, dataLabels, colors = readTrainingSet("adult.test")
+	showScatterPlot(trainingset, colors, 0, 1)
+	#dataset, dataLabels, colors = readTrainingSet("adult.test")
 
 	# TEST TEST TEST TEST TEST TEST TEST TEST TEST
-	algoritmes[sys.argv[1]](trainingset, dataset, trainingLabels, dataLabels)
+	#algoritmes[sys.argv[1]](trainingset, dataset, trainingLabels, dataLabels)
 
 	# '#' weghalen om alles te draaien. TEST ook weghalen
 	# for name, algo in algoritmes:
 	#	algo(trainingset, dataset, dataLabels, trainingLabels)	
 	
-	# showScatterPlot(returnMat, colors, 10, 11)
