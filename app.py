@@ -3,6 +3,9 @@ import stringVals as sv
 from sklearn import svm, tree, neighbors
 from sklearn import metrics as met
 from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 import sys
 
 
@@ -26,21 +29,21 @@ def readTrainingSet(name):
 				elif item == '?':
 					listFromLine.append(0)
 				elif j == 1:
-					listFromLine.append(sv.workclass.index(item))
+					listFromLine.append(sv.workclass.index(item) +0)
 				elif j == 3:
-					listFromLine.append(sv.education.index(item))
+					listFromLine.append(sv.education.index(item) +0)
 				elif j == 5:
-					listFromLine.append(sv.married.index(item))
+					listFromLine.append(sv.married.index(item) +0)
 				elif j == 6:
-					listFromLine.append(sv.occupation.index(item))
+					listFromLine.append(sv.occupation.index(item)+0)
 				elif j == 7:
-					listFromLine.append(sv.relationship.index(item))
+					listFromLine.append(sv.relationship.index(item)+0)
 				elif j == 8:
-					listFromLine.append(sv.race.index(item))
+					listFromLine.append(sv.race.index(item)+0)
 				elif j == 9:
-					listFromLine.append(sv.sex.index(item))
+					listFromLine.append(sv.sex.index(item)+0)
 				elif j == 13:
-					listFromLine.append(sv.country.index(item))
+					listFromLine.append(sv.country.index(item)+0)
 				elif j == 14:
 					listFromLine.append(item.replace(".", ""))
 			returnMat[i,:] = listFromLine[0:14]
@@ -111,24 +114,52 @@ def tree(trainingset, dataset, trainingLabels, dataLabels):
 def svm(trainingset, dataset, trainingLabels, dataLabels):
 	print 'svm'
 	#Dictonary with params
-	params = [{"c":10.0 , "gamma": 5.0} ,{"c":5.0 , "gamma":10.0} ,{"c":3.0 , "gamma":5.0} , {"c":2.0 , "gamma":2.0}]
+	params = [{"c":10.0 , "gamma": 5.0},{"c":random.uniform(0.5, 8.5) , "gamma":random.uniform(0.5, 8.5)}  ,{"c":5.0 , "gamma":10.0} ,{"c":3.0 , "gamma":5.0} , {"c":2.0 , "gamma":1.5} , {"c":2.0 , "gamma":2.0} , {"c":2.0 , "gamma":3.0}]
 	#Normalize
 	dataset, ranges, mins, maxs = normalize(dataset)
 	trainingset = normalize(trainingset, ranges, mins, maxs)
+	print "default params"
+	clf = SVC()
+	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
 	
 	for paramDict in params:
 		print("Params c= "+str(paramDict["c"]) + "gamma =" + str(paramDict["gamma"]));
-		clf = SVC(c = paramDict["c"] , gamma = paramDict["gamma"])
+		clf = SVC(C = paramDict["c"] , gamma = paramDict["gamma"])
 		execute(clf, dataset, trainingset, dataLabels, trainingLabels)
 
 	pass
 
 def naive(trainingset, dataset, trainingLabels, dataLabels):
 	print 'naive'
+	clf = GaussianNB()
+	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
 	pass
 
-def asd(trainingset, dataset, trainingLabels, dataLabels): # MIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKE
-	print 'knn'
+def randomTree(trainingset, dataset, trainingLabels, dataLabels): 
+	print 'randomTree'
+	params = [{"n_estimators":5 , "max_features":5},{"n_estimators":15 , "max_features":8} , {"n_estimators":8 , "max_features":11}, {"n_estimators":20 , "max_features":9} , {"n_estimators":20 , "max_features":7}]
+	print "default params"
+	clf = RandomForestClassifier()
+	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
+
+	for paramDict in params:
+		print("Params n_estimators= "+str(paramDict["n_estimators"]) + "max_features =" + str(paramDict["max_features"]));
+		clf = RandomForestClassifier(n_estimators = paramDict["n_estimators"] , max_features = paramDict["max_features"])
+		execute(clf, dataset, trainingset, dataLabels, trainingLabels)
+	
+	pass
+
+def adaBoost(trainingset, dataset , trainingLabels , dataLabels):
+	print 'adaBoost'
+	params = [{"n_estimators":5} ,{"n_estimators":15} , {"n_estimators":20} , {"n_estimators":25} , {"n_estimators":35}]
+	print "default params"
+	clf = AdaBoostClassifier()
+	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
+
+	for paramDict in params:
+		print("Params n_estimators= "+str(paramDict["n_estimators"]));
+		clf = AdaBoostClassifier(n_estimators = paramDict["n_estimators"])
+		execute(clf, dataset, trainingset, dataLabels, trainingLabels)
 	pass
 
 if __name__ == "__main__":
@@ -137,7 +168,8 @@ if __name__ == "__main__":
 		'tree': tree,
 		'svm': svm,
 		'naive': naive,
-		'': knn}  # MIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKE
+		'randomTree': randomTree , 
+		'adaBoost': adaBoost} 
 	trainingset, trainingLabels, colors = readTrainingSet("adult.data")
 	dataset, dataLabels, colors = readTrainingSet("adult.test")
 
