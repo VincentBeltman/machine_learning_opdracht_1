@@ -171,8 +171,8 @@ if __name__ == "__main__":
 		'naive': naive,
 		'randomTree': randomTree , 
 		'adaBoost': adaBoost} 
-	trainingset, trainingLabels, colors = readTrainingSet("adult.data")
-	showScatterPlot(trainingset, colors, 0, 1)
+	trainingset, trainingLabels, colors = readTrainingSet("adult.test")
+	showScatterPlot(trainingset, colors, 6, 9)
 	#dataset, dataLabels, colors = readTrainingSet("adult.test")
 
 	# TEST TEST TEST TEST TEST TEST TEST TEST TEST
