@@ -84,38 +84,38 @@ def testClassifier(dataset, labels, clf):
 
 	print "Error rate: {0}".format(errorCount / float(dataset.shape[0]))
 
-def execute(clf, dataset, trainingset, dataLabels, trainingLabels):
+def execute(clf, trainingset, dataset, trainingLabels, dataLabels):
 	# Fit
-	clf = clf.fit(dataset, dataLabels)
+	clf = clf.fit(trainingset, trainingLabels)
 
 	# Test
-	testClassifier(trainingset, trainingLabels, clf)
+	testClassifier(dataset, dataLabels, clf)
 
-def knn(trainingset, dataset, dataLabels, trainingLabels):
+def knn(trainingset, dataset, trainingLabels, dataLabels):
 	print 'knn'
 	# Gen KNN
 	clf = neighbors.KNeighborsClassifier(n_neighbors=30)
 
 	# Normalize
-	dataset, ranges, mins, maxs = normalize(dataset)
-	trainingset = normalize(trainingset, ranges, mins, maxs)
+	trainingset, ranges, mins, maxs = normalize(trainingset)
+	dataset = normalize(dataset, ranges, mins, maxs)
 
 	# Fit and test
-	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
+	execute(clf, trainingset, dataset, trainingLabels, dataLabels)
 
-def tree(trainingset, dataset, dataLabels, trainingLabels):
+def tree(trainingset, dataset, trainingLabels, dataLabels):
 	print 'tree'
 	pass
 
-def svm(trainingset, dataset, dataLabels, trainingLabels):
+def svm(trainingset, dataset, trainingLabels, dataLabels):
 	print 'svm'
 	pass
 
-def naive(trainingset, dataset, dataLabels, trainingLabels):
+def naive(trainingset, dataset, trainingLabels, dataLabels):
 	print 'naive'
 	pass
 
-def asd(trainingset, dataset, dataLabels, trainingLabels): # MIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKE
+def asd(trainingset, dataset, trainingLabels, dataLabels): # MIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKE
 	print 'knn'
 	pass
 
@@ -126,14 +126,14 @@ if __name__ == "__main__":
 		'svm': svm,
 		'naive': naive,
 		'': knn}  # MIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKE
-	dataset, dataLabels, colors = readTrainingSet("adult.data")
-	trainingset, trainingLabels, colors = readTrainingSet("adult.test")
+	trainingset, trainingLabels, colors = readTrainingSet("adult.data")
+	dataset, dataLabels, colors = readTrainingSet("adult.test")
 
 	# TEST TEST TEST TEST TEST TEST TEST TEST TEST
-	algoritmes[sys.argv[1]](trainingset, dataset, dataLabels, trainingLabels)
+	algoritmes[sys.argv[1]](trainingset, dataset, trainingLabels, dataLabels)
 
 	# '#' weghalen om alles te draaien. TEST ook weghalen
 	# for name, algo in algoritmes:
-	#	algo()	
+	#	algo(trainingset, dataset, dataLabels, trainingLabels)	
 	
 	# showScatterPlot(returnMat, colors, 10, 11)
