@@ -2,6 +2,7 @@ from numpy import *
 import stringVals as sv
 from sklearn import svm, tree, neighbors
 from sklearn import metrics as met
+import sys
 
 
 def readTrainingSet(name):
@@ -79,17 +80,55 @@ def testClassifier(dataset, labels, clf):
 
 	print "Error rate: {0}".format(errorCount / float(dataset.shape[0]))
 
+def knn():
+	print 'knn'
+	clf = neighbors.KNeighborsClassifier(n_neighbors=30)
+	return clf
+
+def tree():
+	print 'tree'
+	pass
+
+def svm():
+	print 'svm'
+	pass
+
+def naive():
+	print 'naive'
+	pass
+
+def asd(): # MIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKE
+	print 'knn'
+	pass
+
 if __name__ == "__main__":
+	algoritmes = {
+		'knn': knn,
+		'tree': tree,
+		'svm': svm,
+		'naive': naive,
+		'': knn}  # MIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKE
 	dataset, classLabelVector, colors = readTrainingSet("adult.data")
 	dataset, ranges, mins, maxs = normalize(dataset)
 
-	#clf = svm.SVC()
-	#clf = tree.DecisionTreeClassifier()
-	clf = neighbors.KNeighborsClassifier(n_neighbors=30)
 
+	# TEST TEST TEST TEST TEST TEST TEST TEST TEST
+	clf = algoritmes[sys.argv[1]]()  
 	clf = clf.fit(dataset, classLabelVector)
+
 	datasetTest, labels, colors = readTrainingSet("adult.test")
 	datasetTest, ranges, mins, maxs = normalize(datasetTest, ranges, mins, maxs)
+
 	testClassifier(datasetTest, labels, clf)
+
+	# '#' weghalen om alles te draaien. TEST ook weghalen
+	# for algo in algoritmes:
+	# 	clf = clf.fit(dataset, classLabelVector)
+	# 	datasetTest, labels, colors = readTrainingSet("adult.test")
+	# 	datasetTest, ranges, mins, maxs = normalize(datasetTest, ranges, mins, maxs)
+	# 	testClassifier(datasetTest, labels, clf)
+
+
+	
 	
 	# showScatterPlot(returnMat, colors, 10, 11)
