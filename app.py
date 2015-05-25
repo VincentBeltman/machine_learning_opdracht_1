@@ -2,6 +2,7 @@ from numpy import *
 import stringVals as sv
 from sklearn import svm, tree, neighbors
 from sklearn import metrics as met
+from sklearn.svm import SVC
 import sys
 
 
@@ -109,6 +110,17 @@ def tree(trainingset, dataset, dataLabels, trainingLabels):
 
 def svm(trainingset, dataset, dataLabels, trainingLabels):
 	print 'svm'
+	#Dictonary with params
+	params = [{"c":10.0 , "gamma": 5.0} ,{"c":5.0 , "gamma":10.0} ,{"c":3.0 , "gamma":5.0} , {"c":2.0 , "gamma":2.0}]
+	#Normalize
+	dataset, ranges, mins, maxs = normalize(dataset)
+	trainingset = normalize(trainingset, ranges, mins, maxs)
+	
+	for paramDict in params:
+		print("Params c= "+str(paramDict["c"]) + "gamma =" + str(paramDict["gamma"]));
+		clf = SVC(c = paramDict["c"] , gamma = paramDict["gamma"])
+		execute(clf, dataset, trainingset, dataLabels, trainingLabels)
+
 	pass
 
 def naive(trainingset, dataset, dataLabels, trainingLabels):
