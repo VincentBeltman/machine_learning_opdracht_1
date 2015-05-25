@@ -131,6 +131,7 @@ def svm(trainingset, dataset, trainingLabels, dataLabels):
 
 def naive(trainingset, dataset, trainingLabels, dataLabels):
 	print 'naive'
+
 	clf = GaussianNB()
 	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
 	pass
@@ -152,6 +153,8 @@ def randomTree(trainingset, dataset, trainingLabels, dataLabels):
 def adaBoost(trainingset, dataset , trainingLabels , dataLabels):
 	print 'adaBoost'
 	params = [{"n_estimators":5} ,{"n_estimators":15} , {"n_estimators":20} , {"n_estimators":25} , {"n_estimators":35}]
+	dataset, ranges, mins, maxs = normalize(dataset)
+	trainingset = normalize(trainingset, ranges, mins, maxs)
 	print "default params"
 	clf = AdaBoostClassifier()
 	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
