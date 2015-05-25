@@ -58,6 +58,7 @@ def showScatterPlot(data, colors, idx1, idx2):
 	plt.show()
 
 def normalize(dataset, ranges=None, mins=None, maxs=None):
+	returnParams = ranges is None
 	if ranges is None:
 		mins = dataset.min(0)
 		maxs = dataset.max(0)
@@ -66,7 +67,10 @@ def normalize(dataset, ranges=None, mins=None, maxs=None):
 	rowCount = dataset.shape[0]
 	normalized = dataset - tile(mins, (rowCount, 1))
 	normalized = normalized / tile(ranges, (rowCount, 1))
-	return normalized, ranges, mins, maxs
+	if returnParams:
+		return normalized, ranges, mins, maxs
+	else:
+		return normalized
 
 def testClassifier(dataset, labels, clf):
 	errorCount = 0.0
@@ -80,24 +84,38 @@ def testClassifier(dataset, labels, clf):
 
 	print "Error rate: {0}".format(errorCount / float(dataset.shape[0]))
 
-def knn():
-	print 'knn'
-	clf = neighbors.KNeighborsClassifier(n_neighbors=30)
-	return clf
+def execute(clf, dataset, trainingset, dataLabels, trainingLabels):
+	# Fit
+	clf = clf.fit(dataset, dataLabels)
 
-def tree():
+	# Test
+	testClassifier(trainingset, trainingLabels, clf)
+
+def knn(trainingset, dataset, dataLabels, trainingLabels):
+	print 'knn'
+	# Gen KNN
+	clf = neighbors.KNeighborsClassifier(n_neighbors=30)
+
+	# Normalize
+	dataset, ranges, mins, maxs = normalize(dataset)
+	trainingset = normalize(trainingset, ranges, mins, maxs)
+
+	# Fit and test
+	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
+
+def tree(trainingset, dataset, dataLabels, trainingLabels):
 	print 'tree'
 	pass
 
-def svm():
+def svm(trainingset, dataset, dataLabels, trainingLabels):
 	print 'svm'
 	pass
 
-def naive():
+def naive(trainingset, dataset, dataLabels, trainingLabels):
 	print 'naive'
 	pass
 
-def asd(): # MIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKE
+def asd(trainingset, dataset, dataLabels, trainingLabels): # MIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKE
 	print 'knn'
 	pass
 
@@ -108,27 +126,14 @@ if __name__ == "__main__":
 		'svm': svm,
 		'naive': naive,
 		'': knn}  # MIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKEMIKE
-	dataset, classLabelVector, colors = readTrainingSet("adult.data")
-	dataset, ranges, mins, maxs = normalize(dataset)
-
+	dataset, dataLabels, colors = readTrainingSet("adult.data")
+	trainingset, trainingLabels, colors = readTrainingSet("adult.test")
 
 	# TEST TEST TEST TEST TEST TEST TEST TEST TEST
-	clf = algoritmes[sys.argv[1]]()  
-	clf = clf.fit(dataset, classLabelVector)
-
-	datasetTest, labels, colors = readTrainingSet("adult.test")
-	datasetTest, ranges, mins, maxs = normalize(datasetTest, ranges, mins, maxs)
-
-	testClassifier(datasetTest, labels, clf)
+	algoritmes[sys.argv[1]](trainingset, dataset, dataLabels, trainingLabels)
 
 	# '#' weghalen om alles te draaien. TEST ook weghalen
-	# for algo in algoritmes:
-	# 	clf = clf.fit(dataset, classLabelVector)
-	# 	datasetTest, labels, colors = readTrainingSet("adult.test")
-	# 	datasetTest, ranges, mins, maxs = normalize(datasetTest, ranges, mins, maxs)
-	# 	testClassifier(datasetTest, labels, clf)
-
-
-	
+	# for name, algo in algoritmes:
+	#	algo()	
 	
 	# showScatterPlot(returnMat, colors, 10, 11)
