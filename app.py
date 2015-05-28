@@ -1,13 +1,5 @@
 from numpy import *
 import stringVals as sv
-from sklearn import svm, tree, neighbors
-from sklearn import metrics as met
-from sklearn.svm import SVC
-from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import AdaBoostClassifier
-import sys
-
 
 def readTrainingSet(name):
 	with open(name) as dataset:
@@ -18,16 +10,20 @@ def readTrainingSet(name):
 			if len(line.split(', ')) == 15:
 				filtered.append(line)
 				numberOfLines += 1
-		returnMat = zeros((numberOfLines, 13), dtype=float)
+		returnMat = zeros((numberOfLines, 11), dtype=float)
 		classLabelVector = []
 		colors = []
 		for i, line in enumerate(filtered):
 			listFromLine = []
 			for j, item in enumerate(line.split(', ')):
-				if j in [0,2,4,10,11,12]:
-					# Is het capital loss of gain? Voeg alleen toe als de waarde niet nul is
-					if (j in [10, 11] and not(item == '0')) or True:  
+				if j in [0,12]:
+					listFromLine.append(int(item))
+				elif j == 10:
+					if not(int(item) == 0):
 						listFromLine.append(int(item))
+				elif j == 11:
+					if not(int(item) == 0) or len(listFromLine) == 8:
+						listFromLine.append(int(item) * -1)
 				elif item == '?':
 					listFromLine.append(0)
 				elif j == 1:
@@ -47,13 +43,14 @@ def readTrainingSet(name):
 				elif j == 13:
 					listFromLine.append(sv.country.index(item)+0)
 				elif j == 14:
-					listFromLine.append(item.replace(".", ""))
-			returnMat[i,:] = listFromLine[0:13]
-			classLabelVector.append(listFromLine[-1])
-			if listFromLine[-1] == '<=50K\n':
-				colors.append('g')
-			else:
-				colors.append('r')
+					label = item.replace(".", "")
+					classLabelVector.append(label)
+					if label == '<=50K\n':
+						colors.append('g')
+					else:
+						colors.append('r')
+
+			returnMat[i,:] = listFromLine
 
 		return returnMat, classLabelVector, colors
 
@@ -97,23 +94,36 @@ def execute(clf, trainingset, dataset, trainingLabels, dataLabels):
 	testClassifier(dataset, dataLabels, clf)
 
 def knn(trainingset, dataset, trainingLabels, dataLabels):
-	print 'knn'
-	# Gen KNN
-	clf = neighbors.KNeighborsClassifier(n_neighbors=30)
-
-	# Normalize
-	trainingset, ranges, mins, maxs = normalize(trainingset)
-	dataset = normalize(dataset, ranges, mins, maxs)
-
-	# Fit and test
-	execute(clf, trainingset, dataset, trainingLabels, dataLabels)
+	#Dictonary with params
+	params = [{"n_neighbors":10, "algorithm":"auto"}, {"n_neighbors":20, "algorithm":"auto"}, {"n_neighbors":30, "algorithm":"auto"}, {"n_neighbors":20, "algorithm":"kd_tree"}, {"n_neighbors":20, "algorithm":"ball_tree"}]
+	#Normalize
+	dataset, ranges, mins, maxs = normalize(dataset)
+	trainingset = normalize(trainingset, ranges, mins, maxs)
+	print "default params"
+	clf = KNeighborsClassifier()
+	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
+	
+	for paramDict in params:
+		print("Params: n_neighbors = "+str(paramDict["n_neighbors"]) + " algorithm = " + str(paramDict["algorithm"]));
+		clf = KNeighborsClassifier(n_neighbors = paramDict["n_neighbors"] , algorithm = paramDict["algorithm"])
+		execute(clf, dataset, trainingset, dataLabels, trainingLabels)
 
 def tree(trainingset, dataset, trainingLabels, dataLabels):
-	print 'tree'
-	pass
+	#Dictonary with params
+	params = [{"max_features":3 , "max_depth": 10},{"max_features":5 , "max_depth": 15},{"max_features":1 , "max_depth": 20},{"max_features":10 , "max_depth": 2},{"max_features":5 , "max_depth": 10}]
+	#Normalize
+	dataset, ranges, mins, maxs = normalize(dataset)
+	trainingset = normalize(trainingset, ranges, mins, maxs)
+	print "default params"
+	clf = DecisionTreeClassifier()
+	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
+	
+	for paramDict in params:
+		print("Params: max_features = "+str(paramDict["max_features"]) + " max_depth = " + str(paramDict["max_depth"]));
+		clf = DecisionTreeClassifier(max_features = paramDict["max_features"] , max_depth = paramDict["max_depth"])
+		execute(clf, dataset, trainingset, dataLabels, trainingLabels)
 
 def svm(trainingset, dataset, trainingLabels, dataLabels):
-	print 'svm'
 	#Dictonary with params
 	params = [{"c":10.0 , "gamma": 5.0},{"c":random.uniform(0.5, 8.5) , "gamma":random.uniform(0.5, 8.5)}  ,{"c":5.0 , "gamma":10.0} ,{"c":3.0 , "gamma":5.0} , {"c":2.0 , "gamma":1.5} , {"c":2.0 , "gamma":2.0} , {"c":2.0 , "gamma":3.0}]
 	#Normalize
@@ -124,35 +134,27 @@ def svm(trainingset, dataset, trainingLabels, dataLabels):
 	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
 	
 	for paramDict in params:
-		print("Params c= "+str(paramDict["c"]) + "gamma =" + str(paramDict["gamma"]));
+		print("Params: c = "+str(paramDict["c"]) + " gamma = " + str(paramDict["gamma"]));
 		clf = SVC(C = paramDict["c"] , gamma = paramDict["gamma"])
 		execute(clf, dataset, trainingset, dataLabels, trainingLabels)
 
-	pass
-
 def naive(trainingset, dataset, trainingLabels, dataLabels):
-	print 'naive'
-
 	clf = GaussianNB()
+	print "default params"
 	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
-	pass
 
 def randomTree(trainingset, dataset, trainingLabels, dataLabels): 
-	print 'randomTree'
 	params = [{"n_estimators":5 , "max_features":5},{"n_estimators":15 , "max_features":8} , {"n_estimators":8 , "max_features":11}, {"n_estimators":20 , "max_features":9} , {"n_estimators":20 , "max_features":7}]
 	print "default params"
 	clf = RandomForestClassifier()
 	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
 
 	for paramDict in params:
-		print("Params n_estimators= "+str(paramDict["n_estimators"]) + "max_features =" + str(paramDict["max_features"]));
+		print("Params: n_estimators = "+str(paramDict["n_estimators"]) + " max_features = " + str(paramDict["max_features"]));
 		clf = RandomForestClassifier(n_estimators = paramDict["n_estimators"] , max_features = paramDict["max_features"])
 		execute(clf, dataset, trainingset, dataLabels, trainingLabels)
-	
-	pass
 
 def adaBoost(trainingset, dataset , trainingLabels , dataLabels):
-	print 'adaBoost'
 	params = [{"n_estimators":5} ,{"n_estimators":15} , {"n_estimators":20} , {"n_estimators":25} , {"n_estimators":35}]
 	dataset, ranges, mins, maxs = normalize(dataset)
 	trainingset = normalize(trainingset, ranges, mins, maxs)
@@ -161,10 +163,9 @@ def adaBoost(trainingset, dataset , trainingLabels , dataLabels):
 	execute(clf, dataset, trainingset, dataLabels, trainingLabels)
 
 	for paramDict in params:
-		print("Params n_estimators= "+str(paramDict["n_estimators"]));
+		print("Params: n_estimators = "+str(paramDict["n_estimators"]));
 		clf = AdaBoostClassifier(n_estimators = paramDict["n_estimators"])
 		execute(clf, dataset, trainingset, dataLabels, trainingLabels)
-	pass
 
 if __name__ == "__main__":
 	algoritmes = {
@@ -172,16 +173,17 @@ if __name__ == "__main__":
 		'tree': tree,
 		'svm': svm,
 		'naive': naive,
-		'randomTree': randomTree , 
+		'randomTree': randomTree, 
 		'adaBoost': adaBoost} 
-	trainingset, trainingLabels, colors = readTrainingSet("adult.test")
-	showScatterPlot(trainingset, colors, 6, 9)
-	#dataset, dataLabels, colors = readTrainingSet("adult.test")
+	trainingset, trainingLabels, colors = readTrainingSet("adult.data")
+	dataset, dataLabels, colors = readTrainingSet("adult.test")
 
-	# TEST TEST TEST TEST TEST TEST TEST TEST TEST
-	#algoritmes[sys.argv[1]](trainingset, dataset, trainingLabels, dataLabels)
+	# matplotlib
+	# for i in range(0,11):
+	# 	for j in range(0,11):
+	# 		showScatterPlot(trainingset, colors, i, j)
 
-	# '#' weghalen om alles te draaien. TEST ook weghalen
-	# for name, algo in algoritmes:
-	#	algo(trainingset, dataset, dataLabels, trainingLabels)	
+	for name, algo in algoritmes.items():
+		print name
+		algo(trainingset, dataset, trainingLabels, dataLabels)	
 	
