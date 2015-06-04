@@ -1,0 +1,10 @@
+sv = {2: ["alfa-romero", "audi", "bmw", "chevrolet", "dodge", "honda", "isuzu", "jaguar", "mazda", "mercedes-benz", "mercury", "mitsubishi", "nissan", "peugot", "plymouth", "porsche", "renault", "saab", "subaru", "toyota", "volkswagen", "volvo"],
+3: ["diesel", "gas"],
+4: ["std", "turbo"],
+5: ["four", "two"],
+6: ["hardtop", "wagon", "sedan", "hatchback", "convertible"],
+7: ["4wd", "fwd", "rwd"],
+8: ["front", "rear"],
+14: ["dohc", "dohcv", "l", "ohc", "ohcf", "ohcv", "rotor"],
+15: ["eight", "five", "four", "six", "three", "twelve", "two"],
+17: ["1bbl", "2bbl", "4bbl", "idi", "mfi", "mpfi", "spdi", "spfi"]}
