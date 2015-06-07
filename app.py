@@ -1,8 +1,10 @@
+
 from numpy import *
 from stringVals import sv
 import matplotlib.pyplot as plt
 from sklearn import linear_model, cross_validation
 from sklearn.metrics import *
+from sklearn.decomposition  import PCA as skPCA
 
 def readTrainingSet(name, N=25):
 	with open(name) as dataset:
@@ -51,7 +53,7 @@ def readTrainingSet(name, N=25):
 
 def scatter(xas, yas, i):
 	plt.legend(loc=2)
-	plt.xlabel(str(i))
+	plt.xlabel(i)
 	plt.ylabel("Car price")
 	plt.scatter(xas, yas, c='g')
 
@@ -59,16 +61,61 @@ def plot(xas, line):
 	plt.plot(xas, line, color='red', linewidth=3)
 	plt.show()
 
-if __name__ == "__main__":
-	trainingset, trainingLabels, colors = readTrainingSet("autoprice.txt")
+def execLinearRegression(trainingset , trainingLabels, folds=8):
+	print("LinearRegression")
 	clf = linear_model.LinearRegression()
-	kf = cross_validation.KFold(len(trainingset), n_folds=2, shuffle=True)
+	kf = cross_validation.KFold(len(trainingset), n_folds=folds, shuffle=True)
+	scores = []
 
 	for train_index, test_index in kf:
 		clf.fit(trainingset[train_index], array(trainingLabels)[train_index])
-		print clf.score(trainingset[test_index], array(trainingLabels)[test_index])
-		print ""
-		for i in range(0,25):
-			scatter(trainingset[train_index][:,i], array(trainingLabels)[train_index], i)
-			plot(trainingset[test_index][:,i], clf.predict(trainingset[test_index]))
-		break
+		score = clf.score(trainingset[test_index], array(trainingLabels)[test_index])
+		print "Score:", score
+		scores.append(score)
+		# i = 0
+		# scatter(trainingset[train_index][:,i], array(trainingLabels)[train_index], i)
+		# plot(trainingset[test_index][:,i], clf.predict(trainingset[test_index]))
+	calcAvgScore(scores, folds)
+	print("\n")
+
+def calcAvgScore(scores, folds):
+	highest = 0
+	lowest  = 0
+	total   = 0
+	for score in scores:
+		if highest == 0:
+			highest = score
+			lowest = score
+		elif score > highest:
+			total += highest
+			highest = score
+		elif score < lowest:
+			total += lowest
+			lowest = score
+		else:
+			total += score
+	print "Gemiddelde score:", total/folds-2
+
+
+def execPCA(trainingset , trainingLabels):
+	print("PCA")
+	for i in range(1 , 10):
+		pca = skPCA(n_components = i)
+		transformedData = pca.fit(trainingset).transform(trainingset)
+		#print  #, " Variantie: " , pca.explained_variance_ratio_
+		clf = linear_model.LinearRegression()
+		clf.fit(transformedData , trainingLabels)
+		print "Number of Components: " , i "score " , clf.score(transformedData , trainingLabels) , "Variantie" , pca.explained_variance_ratio_;
+	for i in range(1 , 10):
+		pca = skPCA(n_components = i , whiten = True)
+		transformedData = pca.fit(trainingset).transform(trainingset)
+		#print  #, " Variantie: " , pca.explained_variance_ratio_
+		clf = linear_model.LinearRegression()
+		clf.fit(transformedData , trainingLabels)
+		print "Whiten True Number of Components: " , i "score " , clf.score(transformedData , trainingLabels) , "Variantie" , pca.explained_variance_ratio_;
+
+
+if __name__ == "__main__":
+	trainingset, trainingLabels, colors = readTrainingSet("autoprice.txt")
+	execLinearRegression(trainingset , trainingLabels )
+	#execPCA(trainingset , trainingLabels)
