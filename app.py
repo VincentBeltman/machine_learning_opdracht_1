@@ -49,8 +49,8 @@ def plot(xas, line):
 	plt.plot(xas, line, color='red', linewidth=3)
 	plt.show()
 
-def execLinearRegression(trainingset , trainingLabels, folds=8):
-	print("LinearRegression numberOfFolds " , folds)
+def execLinearRegressionKFold(trainingset , trainingLabels, folds=8):
+	print "LinearRegression cross_validation KFold numberOfFolds " , folds
 	clf = linear_model.LinearRegression()
 	kf = cross_validation.KFold(len(trainingset), n_folds=folds, shuffle=True)
 	scores = []
@@ -65,6 +65,19 @@ def execLinearRegression(trainingset , trainingLabels, folds=8):
 		# plot(trainingset[test_index][:,i], clf.predict(trainingset[test_index]))
 	print("\n")
 	return calcAvgScore(scores, folds)
+
+def execLinearRegressionShuffleSplit(trainingset , trainingLabels ):
+	print "LinearRegression cross_validation ShuffleAndSplit"
+	cv =  cross_validation.ShuffleSplit(len(trainingset) , n_iter=10 , test_size = 0.15 , random_state =0)
+	clf = linear_model.LinearRegression()
+	scores = []
+	for train_index , test_index in cv:
+		clf.fit(trainingset[train_index] , array(trainingLabels)[train_index])
+		score = clf.score(trainingset[test_index], array(trainingLabels)[test_index])
+		scores.append(score)
+		print "Score:", score
+	print("\n")
+	print"gem",  calcAvgScore(scores, 10)
 
 def calcAvgScore(scores, folds):
 	highest = -1
@@ -104,9 +117,11 @@ if __name__ == "__main__":
 	trainingset, trainingLabels = readTrainingSet("autoprice.txt")
 	scores = {}
 	for i in range(2, 9):
-		scores[i] = execLinearRegression(trainingset , trainingLabels, i)
+		scores[i] = execLinearRegressionKFold(trainingset , trainingLabels, i)
 	print "Score tabel:"
 	print "Nr folds\t| Score"
 	for fold, score in scores.items():
 		print fold, '\t\t|', score
+
+	execLinearRegressionShuffleSplit(trainingset , trainingLabels)
 	#execPCA(trainingset , trainingLabels)
