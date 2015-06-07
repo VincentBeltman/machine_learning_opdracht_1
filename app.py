@@ -58,15 +58,21 @@ def scatter(xas, yas):
 def plot(xas, line):
 	plt.plot(xas, line, color='red', linewidth=3)
 	plt.show()
-
-if __name__ == "__main__":
-	trainingset, trainingLabels, colors = readTrainingSet("autoprice.txt")
+def execLinearRegression(trainingset):
+	print("LinearRegression")
 	clf = linear_model.LinearRegression()
 	kf = cross_validation.KFold(len(trainingset), n_folds=8, shuffle=True)
 
 	for train_index, test_index in kf:
 		clf.fit(trainingset[train_index], array(trainingLabels)[train_index])
-		print clf.score(trainingset[test_index], array(trainingLabels)[test_index])
-		print ""
+		print "Score: " , clf.score(trainingset[test_index], array(trainingLabels)[test_index])
+	print("\n")
+def execPCA(trainingset):
+	print("PCA")
+
+if __name__ == "__main__":
+	trainingset, trainingLabels, colors = readTrainingSet("autoprice.txt")
+	execLinearRegression(trainingset);
+	execPCA(trainingset)
 		# scatter(trainingset[train_index][:,N], array(trainingLabels)[train_index])
 		# plot(trainingset[test_index][:,N], clf.predict(trainingset[test_index]))
