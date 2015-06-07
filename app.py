@@ -79,23 +79,21 @@ def execLinearRegression(trainingset , trainingLabels, folds=8):
 	print("\n")
 
 def calcAvgScore(scores, folds):
-	highest = 0
-	lowest  = 0
+	highest = -1
+	lowest  = 1
 	total   = 0
 	for score in scores:
-		if highest == 0:
-			highest = score
-			lowest = score
-		elif score > highest:
-			total += highest
+		if score > highest:
 			highest = score
 		elif score < lowest:
-			total += lowest
 			lowest = score
-		else:
-			total += score
-	print "Gemiddelde score:", total/folds-2
-
+		total += score
+	if len(scores) >= 6:
+		total -= highest
+		total -= lowest
+		print "Gemiddelde score:", total/(folds-2)
+	else:
+		print "Gemiddelde score:", total/folds
 
 def execPCA(trainingset , trainingLabels):
 	print("PCA")
@@ -117,5 +115,6 @@ def execPCA(trainingset , trainingLabels):
 
 if __name__ == "__main__":
 	trainingset, trainingLabels, colors = readTrainingSet("autoprice.txt")
-	execLinearRegression(trainingset , trainingLabels )
+	for i in range(2, 9):
+		execLinearRegression(trainingset , trainingLabels, i)
 	#execPCA(trainingset , trainingLabels)
