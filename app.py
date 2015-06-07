@@ -49,10 +49,10 @@ def readTrainingSet(name, N=25):
 
 		return returnMat, answers, colors
 
-def scatter(xas, yas):
+def scatter(xas, yas, i):
 	plt.legend(loc=2)
-	plt.xlabel("ages")
-	plt.ylabel("net worths")
+	plt.xlabel(str(i))
+	plt.ylabel("Car price")
 	plt.scatter(xas, yas, c='g')
 
 def plot(xas, line):
@@ -62,11 +62,13 @@ def plot(xas, line):
 if __name__ == "__main__":
 	trainingset, trainingLabels, colors = readTrainingSet("autoprice.txt")
 	clf = linear_model.LinearRegression()
-	kf = cross_validation.KFold(len(trainingset), n_folds=8, shuffle=True)
+	kf = cross_validation.KFold(len(trainingset), n_folds=2, shuffle=True)
 
 	for train_index, test_index in kf:
 		clf.fit(trainingset[train_index], array(trainingLabels)[train_index])
 		print clf.score(trainingset[test_index], array(trainingLabels)[test_index])
 		print ""
-		# scatter(trainingset[train_index][:,N], array(trainingLabels)[train_index])
-		# plot(trainingset[test_index][:,N], clf.predict(trainingset[test_index]))
+		for i in range(0,25):
+			scatter(trainingset[train_index][:,i], array(trainingLabels)[train_index], i)
+			plot(trainingset[test_index][:,i], clf.predict(trainingset[test_index]))
+		break
