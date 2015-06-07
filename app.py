@@ -76,7 +76,14 @@ def execPCA(trainingset , trainingLabels):
 		#print  #, " Variantie: " , pca.explained_variance_ratio_
 		clf = linear_model.LinearRegression()
 		clf.fit(transformedData , trainingLabels)
-		print "Number of Components: " , i "score " , clf.score(transformedData , trainingLabels) , "Variantie" , clf.explained_variance_ratio_;
+		print "Number of Components: " , i "score " , clf.score(transformedData , trainingLabels) , "Variantie" , pca.explained_variance_ratio_;
+	for i in range(1 , 10):
+		pca = skPCA(n_components = i , whiten = True)
+		transformedData = pca.fit(trainingset).transform(trainingset)
+		#print  #, " Variantie: " , pca.explained_variance_ratio_
+		clf = linear_model.LinearRegression()
+		clf.fit(transformedData , trainingLabels)
+		print "Whiten True Number of Components: " , i "score " , clf.score(transformedData , trainingLabels) , "Variantie" , pca.explained_variance_ratio_;
 
 
 if __name__ == "__main__":
