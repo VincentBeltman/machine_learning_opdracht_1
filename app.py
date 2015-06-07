@@ -6,7 +6,7 @@ from sklearn import linear_model, cross_validation
 from sklearn.metrics import *
 from sklearn.decomposition  import PCA as skPCA
 
-def readTrainingSet(name, N=25):
+def readTrainingSet(name):
 	with open(name) as dataset:
 		lines = dataset.readlines()
 		filtered = []
@@ -20,6 +20,11 @@ def readTrainingSet(name, N=25):
 				else:
 					filtered.append(line)
 					numberOfLines += 1
+
+		stringFeatures = [2, 3, 4, 5, 6, 7, 8, 14, 15, 17]
+		floatFeatures = [0, 1, 9, 10, 11, 12, 13, 16, 18, 19, 20, 21, 22, 23, 24]
+		N = len(stringFeatures) + len(floatFeatures)
+
 		returnMat = zeros((numberOfLines, N), dtype=float)
 		answers = []
 
@@ -27,9 +32,9 @@ def readTrainingSet(name, N=25):
 			listFromLine = []
 			add = True
 			for j, item in enumerate(line):
-				if j in [2, 3, 4, 5, 6, 7, 8, 14, 15, 17]:
+				if j in stringFeatures:
 					listFromLine.append(float(sv[j].index(item)))
-				elif j in [0, 1, 9, 10, 11, 12, 13, 16, 18, 19, 20, 21, 22, 23, 24]:
+				elif j in floatFeatures:
 					listFromLine.append(float(item))
 				elif j == 25:
 					item = float(item)
