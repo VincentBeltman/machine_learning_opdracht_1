@@ -77,7 +77,7 @@ def execLinearRegressionShuffleSplit(trainingset , trainingLabels ):
 		scores.append(score)
 		print "Score:", score
 	print("\n")
-	print"gem",  calcAvgScore(scores, 10)
+	print"gem",  calcAvgScore(scores, 10) ,  "\n"
 
 def calcAvgScore(scores, folds):
 	highest = -1
@@ -124,4 +124,4 @@ if __name__ == "__main__":
 		print fold, '\t\t|', score
 
 	execLinearRegressionShuffleSplit(trainingset , trainingLabels)
-	#execPCA(trainingset , trainingLabels)
+	execPCA(trainingset , trainingLabels)
