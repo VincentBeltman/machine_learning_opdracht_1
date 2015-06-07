@@ -23,9 +23,6 @@ def readTrainingSet(name, N=25):
 		returnMat = zeros((numberOfLines, N), dtype=float)
 		answers = []
 
-		maxAnswer = 0
-		minAnswer = 45400
-
 		for i, line in enumerate(filtered):
 			listFromLine = []
 			add = True
@@ -37,19 +34,10 @@ def readTrainingSet(name, N=25):
 				elif j == 25:
 					item = float(item)
 					answers.append(item)
-					minAnswer = item if item < minAnswer else minAnswer
-					maxAnswer = item if item > maxAnswer else maxAnswer
 			else:
 				returnMat[i,:] = listFromLine
-		gem = (maxAnswer + minAnswer) / 2
-		colors = []
-		for answer in answers:
-			if answer > gem:
-				colors.append('r')
-			else:
-				colors.append('g')
 
-		return returnMat, answers, colors
+		return returnMat, answers
 
 def scatter(xas, yas, i):
 	plt.legend(loc=2)
@@ -75,8 +63,8 @@ def execLinearRegression(trainingset , trainingLabels, folds=8):
 		# i = 0
 		# scatter(trainingset[train_index][:,i], array(trainingLabels)[train_index], i)
 		# plot(trainingset[test_index][:,i], clf.predict(trainingset[test_index]))
-	calcAvgScore(scores, folds)
 	print("\n")
+	return calcAvgScore(scores, folds)
 
 def calcAvgScore(scores, folds):
 	highest = -1
@@ -91,9 +79,8 @@ def calcAvgScore(scores, folds):
 	if len(scores) >= 6:
 		total -= highest
 		total -= lowest
-		print "Gemiddelde score:", total/(folds-2)
-	else:
-		print "Gemiddelde score:", total/folds
+		return total/(folds-2)
+	return total/folds
 
 def execPCA(trainingset , trainingLabels):
 	print("PCA")
@@ -114,7 +101,12 @@ def execPCA(trainingset , trainingLabels):
 
 
 if __name__ == "__main__":
-	trainingset, trainingLabels, colors = readTrainingSet("autoprice.txt")
+	trainingset, trainingLabels = readTrainingSet("autoprice.txt")
+	scores = {}
 	for i in range(2, 9):
-		execLinearRegression(trainingset , trainingLabels, i)
+		scores[i] = execLinearRegression(trainingset , trainingLabels, i)
+	print "Score tabel:"
+	print "Nr folds\t| Score"
+	for fold, score in scores.items():
+		print fold, '\t\t|', score
 	#execPCA(trainingset , trainingLabels)
