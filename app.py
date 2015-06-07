@@ -3,6 +3,7 @@ from stringVals import sv
 import matplotlib.pyplot as plt
 from sklearn import linear_model, cross_validation
 from sklearn.metrics import *
+from sklearn.decomposition  import PCA as skPCA
 
 def readTrainingSet(name, N=25):
 	with open(name) as dataset:
@@ -58,7 +59,7 @@ def scatter(xas, yas):
 def plot(xas, line):
 	plt.plot(xas, line, color='red', linewidth=3)
 	plt.show()
-def execLinearRegression(trainingset):
+def execLinearRegression(trainingset , trainingLabels):
 	print("LinearRegression")
 	clf = linear_model.LinearRegression()
 	kf = cross_validation.KFold(len(trainingset), n_folds=8, shuffle=True)
@@ -67,12 +68,20 @@ def execLinearRegression(trainingset):
 		clf.fit(trainingset[train_index], array(trainingLabels)[train_index])
 		print "Score: " , clf.score(trainingset[test_index], array(trainingLabels)[test_index])
 	print("\n")
-def execPCA(trainingset):
+def execPCA(trainingset , trainingLabels):
 	print("PCA")
+	for i in range(1 , 10):
+		pca = skPCA(n_components = i)
+		transformedData = pca.fit(trainingset).transform(trainingset)
+		#print  #, " Variantie: " , pca.explained_variance_ratio_
+		clf = linear_model.LinearRegression()
+		clf.fit(transformedData , trainingLabels)
+		print "Number of Components: " , i "score " , clf.score(transformedData , trainingLabels) , "Variantie" , clf.explained_variance_ratio_;
+
 
 if __name__ == "__main__":
 	trainingset, trainingLabels, colors = readTrainingSet("autoprice.txt")
-	execLinearRegression(trainingset);
-	execPCA(trainingset)
+	execLinearRegression(trainingset , trainingLabels );
+	execPCA(trainingset , trainingLabels)
 		# scatter(trainingset[train_index][:,N], array(trainingLabels)[train_index])
 		# plot(trainingset[test_index][:,N], clf.predict(trainingset[test_index]))
