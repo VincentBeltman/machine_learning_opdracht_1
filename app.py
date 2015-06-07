@@ -62,7 +62,7 @@ def plot(xas, line):
 	plt.show()
 
 def execLinearRegression(trainingset , trainingLabels, folds=8):
-	print("LinearRegression")
+	print("LinearRegression numberOfFolds " , folds)
 	clf = linear_model.LinearRegression()
 	kf = cross_validation.KFold(len(trainingset), n_folds=folds, shuffle=True)
 	scores = []
