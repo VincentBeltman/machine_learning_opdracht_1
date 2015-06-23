@@ -80,7 +80,7 @@ def getTop5(statistic):
 		else:
 			highestFemale = highest
 			resultFemale = result
-	return highestFemale
+	return resultFemale, resultMen
 
 if __name__ == "__main__":
 	genres = readGenres()
