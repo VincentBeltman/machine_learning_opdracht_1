@@ -22,7 +22,7 @@ def readUsers():
 			}
 	return users
 
-def readMovies(genres):
+def readMovies():
 	movies = {}
 	with open('data/u.item') as f:
 		for line in f.readlines():
@@ -115,5 +115,5 @@ except Exception, e:
 if __name__ == "__main__":
 	genres = readGenres()
 	users = readUsers()
-	movies = readMovies(genres)
+	movies = readMovies()
 	data = printStatistics(genres, users, movies)
