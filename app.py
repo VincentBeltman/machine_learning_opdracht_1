@@ -75,17 +75,17 @@ def printStatistics(genres, users, movies):
 			genreRankingResult = addOrCreate(genre, genreRankingResult, {movies[movie_id]['title']: float(total) / len(ratings)}, True)
 
 	for statistic in top5Items:
-		printMethod(getTop5Ranking(statistic[1], genres))
+		printMethod(getTop5Ranking(statistic[1]))
 	print "\nMovie per genre ranking"
-	printMethod(getTop5Ranking(genreRankingResult, genres))
+	printMethod(getTop5Ranking(genreRankingResult))
 	print "\nMovie ranking top 10"
 	printMethod(getTopN(movieRankingResult, 10))
 
-def getTop5Ranking(statistic, genreNames):
+def getTop5Ranking(statistic):
 	return {key: getTopN(items) for key, items in statistic.items()}
 
 def getTopN(statistic, N=5):
-	highest = [0, 0, 0, 0, 0]
+	highest = [0] * N
 	resultList = []
 	for key, count in statistic.items():
 		if count > highest[-1]:
