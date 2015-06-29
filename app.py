@@ -18,7 +18,8 @@ def readUsers():
 				'age': '{0}-{1}'.format(age, age + 10),
 				'gender': data[2],
 				'occupation': data[3],
-				'zipcodefirst': data[4][0]
+				'zipcodefirst': data[4][0],
+				'user_id': data[0]
 			}
 	return users
 
@@ -75,11 +76,11 @@ def printStatistics(genres, users, movies):
 			genreRankingResult = addOrCreate(genre, genreRankingResult, {movies[movie_id]['title']: float(total) / len(ratings)}, True)
 
 	for statistic in top5Items:
-		printMethod(getTop5Ranking(statistic[1]))
+		P(getTop5Ranking(statistic[1]))
 	print "\nMovie per genre ranking"
-	printMethod(getTop5Ranking(genreRankingResult))
+	P(getTop5Ranking(genreRankingResult))
 	print "\nMovie ranking top 10"
-	printMethod(getTopN(movieRankingResult, 10))
+	P(getTopN(movieRankingResult, 10))
 
 def getTop5Ranking(statistic):
 	return {key: getTopN(items) for key, items in statistic.items()}
@@ -105,12 +106,13 @@ def addOrCreate(check, itemList, newVal, isDict=False):
 
 def printIt(printable): print printable
 
-printMethod = None
+P = None
 try:
 	from pprint import pprint
-	printMethod = pprint
+	P = pprint
 except Exception, e:
-	printMethod = printIt
+	P = printIt
+
 
 if __name__ == "__main__":
 	genres = readGenres()
